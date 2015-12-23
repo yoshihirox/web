@@ -2,6 +2,7 @@ onload = function(){
 	var canvas ;
 	var gl;
 	var prg;
+	var input_key_buffer = new Array();
 	
 	function showFPS(){
 		var stats = new Stats();
@@ -88,6 +89,10 @@ onload = function(){
 		gl.enableVertexAttribArray(attLocation);
 		gl.vertexAttribPointer(attLocation, attStride, gl.FLOAT, false, 0, 0);
 	}
+	function setUniform(name, value){
+		var uniLocation = gl.getUniformLocation (prg, name);
+		gl.uniformMatrix4fv(uniLocation, gl.FALSE, value);
+	}
 	
 
 	
@@ -96,26 +101,40 @@ onload = function(){
 		gl.clearDepth(1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		
-    var m = new matIV();
-    
-    // 各種行列の生成と初期化
-    var mMatrix = m.identity(m.create());
-    var vMatrix = m.identity(m.create());
-    var pMatrix = m.identity(m.create());
-    var mvpMatrix = m.identity(m.create());
-    
-    // ビュー座標変換行列
-    m.lookAt([0.0, 1.0, 3.0], [0, 0, 0], [0, 1, 0], vMatrix);
-    
-    // プロジェクション座標変換行列
-    m.perspective(90, canvas.width / canvas.height, 0.1, 100, pMatrix);
-    
-    // 各行列を掛け合わせ座標変換行列を完成させる
-    m.multiply(pMatrix, vMatrix, mvpMatrix);
-    m.multiply(mvpMatrix, mMatrix, mvpMatrix);
+   		//var m = mat4.create();
+		// var mMatrix = m.identity(m.create());
+		// var vMatrix = m.identity(m.create());
+		// var pMatrix = m.identity(m.create());
+		// var mvpMatrix = m.identity(m.create());
+		toRad = function(deg){
+			return deg*(Math.PI/ 180.0)
+		}
+			
+		var matP = mat4.create();
+		var matV = mat4.create();
+		var matM = mat4.create();
+		var matMVP = mat4.create();
+		var matMV = mat4.create();
+		//var matN = mat3.create();
 		
-		var uniLocation = gl.getUniformLocation (prg, "mvpMatrix");
-		gl.uniformMatrix4fv(uniLocation, false, mvpMatrix);
+		
+		var loc = vec3.set(vec3.create(),0.0, 1.0, 3.0);
+		console.log(loc);
+		var center = vec3.set(vec3.create(),0,0,0);
+		var up = vec3.set(vec3.create(),0,1,0);
+		var test =mat4.create();
+		mat4.lookAt(matV,loc,center,up);
+		var aspcet = canvas.width/canvas.height;
+		var fov  = toRad(90.0);
+		//m.lookAt([0.0, 1.0, 3.0], [0, 0, 0], [0, 1, 0], vMatrix);
+		mat4.perspective(matP, fov, aspcet, 0.1, 100.0);
+		mat4.mul(matMV, matV, matM);
+		mat4.mul(matMVP, matP, matMV);
+		// m.perspective(90, canvas.width / canvas.height, 0.1, 100, pMatrix);
+		// m.multiply(pMatrix, vMatrix, mvpMatrix);
+		// m.multiply(mvpMatrix, mMatrix, mvpMatrix);
+		setUniform("mvpMatrix", matMVP);
+
 		gl.drawArrays(gl.TRIANGLES, 0, 3);
 		gl.flush();
 		
@@ -132,4 +151,19 @@ onload = function(){
 		draw();
 	}
 	startup();
+	
+	
+	
+	document.onkeydown = function(e){
+		//console.log(e);
+		input_key_buffer[e.keyCode] = true;
+		//console.log("code: " + key_code);
+		console.log("pushed "+ input_key_buffer[e.keyCode]);
+	}
+	
+	document.onkeyup = function(e){
+		input_key_buffer[e.keyCode] = false;
+		console.log("pulled "+ input_key_buffer[e.keyCode]);
+	}
+
 }
