@@ -53,7 +53,7 @@ var ylib = (function(){
 }());
 
 var CADCam = (function(){
-  var position = vec3.create(0,0,3.0);
+  var position = vec3.fromValues(0,0,3.0);
   var sensi = 0.01;
   var center = (function(){
    var position = vec3.create();
