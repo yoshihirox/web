@@ -109,30 +109,24 @@ onload = function(){
 		var matM = mat4.create();
 		var matMVP = mat4.create();
 		var matMV = mat4.create();
-		//var matN = mat3.create();
-
 
 		var loc = vec3.set(vec3.create(),0.0, 1.0, 3.0);
-		console.log(loc);
 		var center = vec3.set(vec3.create(),0,0,0);
 		var up = vec3.set(vec3.create(),0,1,0);
-		var test =mat4.create();
-		mat4.lookAt(matV,loc,center,up);
+		mat4.lookAt(matV,CADCam.position,CADCam.center.position,up);
+
 		var aspcet = canvas.width/canvas.height;
 		var fov  = toRad(90.0);
-		//m.lookAt([0.0, 1.0, 3.0], [0, 0, 0], [0, 1, 0], vMatrix);
 		mat4.perspective(matP, fov, aspcet, 0.1, 100.0);
+
 		mat4.mul(matMV, matV, matM);
 		mat4.mul(matMVP, matP, matMV);
-		// m.perspective(90, canvas.width / canvas.height, 0.1, 100, pMatrix);
-		// m.multiply(pMatrix, vMatrix, mvpMatrix);
-		// m.multiply(mvpMatrix, mMatrix, mvpMatrix);
 		setUniform("mvpMatrix", matMVP);
 
 		gl.drawArrays(gl.TRIANGLES, 0, 3);
 		gl.flush();
 
-	//requestAnimationFrame(draw);
+	requestAnimationFrame(draw);
 	}
 
 	function startup(){
