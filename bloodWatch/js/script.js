@@ -104,23 +104,23 @@ onload = function(){
 			return deg*(Math.PI/ 180.0)
 		}
 
-		var matP = mat4.create();
-		var matV = mat4.create();
-		var matM = mat4.create();
-		var matMVP = mat4.create();
-		var matMV = mat4.create();
+		var matP = mat4.identity(mat4.create());
+		var matV =  mat4.identity(mat4.create());
+		var matM =  mat4.identity(mat4.create());
+		var matMVP =  mat4.identity(mat4.create());
+		var matMV =  mat4.identity(mat4.create());
 
-		var loc = vec3.set(vec3.create(),0.0, 1.0, 3.0);
-		var center = vec3.set(vec3.create(),0,0,0);
-		var up = vec3.set(vec3.create(),0,1,0);
-		mat4.lookAt(matV,CADCam.position,CADCam.center.position,up);
-
+		var loc = vec3.create([0.0, 1.0, 3.0]);
+		var center = vec3.create([0,0,0]);
+		var up = vec3.create([0,1,0]);
+		mat4.lookAt(CADCam.position,CADCam.center.position,up, matV);
+		//mat4.lookAt(loc, center, up, matV);
 		var aspcet = canvas.width/canvas.height;
 		var fov  = toRad(90.0);
-		mat4.perspective(matP, fov, aspcet, 0.1, 100.0);
+		mat4.perspective( 90.0, aspcet, 0.1, 100.0, matP);
 
-		mat4.mul(matMV, matV, matM);
-		mat4.mul(matMVP, matP, matMV);
+		matMV = mat4.multiply( matV, matM);
+		matMVP = mat4.multiply(matP, matMV);
 		setUniform("mvpMatrix", matMVP);
 
 		gl.drawArrays(gl.TRIANGLES, 0, 3);

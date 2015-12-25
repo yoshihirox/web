@@ -53,7 +53,7 @@ var ylib = (function(){
 }());
 
 var CADCam = (function(){
-  var position = vec3.fromValues(0,0,3.0);
+  var position = vec3.create([0,0,3.0]);
   var sensi = 0.01;
   var center = (function(){
    var position = vec3.create();
@@ -105,18 +105,18 @@ document.onmousemove = function handleMouseMove(e){
   //console.log(mouseProp.clicking);
   var diff = vec3.create();
   if(mouseProp.clicking){
-    var currentPos = vec3.fromValues(e.clientX, e.clientY, 0);
-    vec3.sub(diff, currentPos, mouseProp.clickPos);
-    vec3.scale(diff,diff, CADCam.sensi);
+    var currentPos = vec3.create([e.clientX, e.clientY, 0]);
+    vec3.subtract( currentPos, mouseProp.clickPos, diff);
+    vec3.scale(diff, CADCam.sensi, diff);
     mouseProp.clickPos = currentPos;
   }
   if(e.button == 0){//if click button is down
     vec3.invertY(diff);
-    vec3.add(CADCam.center.position, CADCam.center.position, diff);
+    vec3.add( CADCam.center.position, diff);
   }
   if(e.button == 1){// if wheel button is down
     //vec3.invertY(diff);
-    vec3.add(CADCam.position, CADCam.position,diff);
+    vec3.add( CADCam.position,diff);
     //vec3.invertX(diff);
     //vec3.add(CADCam.center.position, CADCam.center.position, diff);
   }
@@ -130,7 +130,7 @@ document.onmousedown = function handleMouseUp(event){
   // console.log("mousemove -clientX=%d, clientY=%d, button=%d",event.clientX, event.clientY, event.button);
   mouseProp.clicking = true;
   vec3.setXY(mouseProp.clickPos,event.clientX, event.clientY);
-  console.log(mouseProp.clickPos);
+  //console.log(mouseProp.clickPos);
 }
 
 document.onmouseup = function handleMouseDown(event){
