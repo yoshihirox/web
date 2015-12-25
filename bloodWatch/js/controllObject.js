@@ -24,6 +24,12 @@ vec3.setZ = function(out, z){
   out[2] = z;
   return out;
 }
+vec3.invertY = function(out){
+  out[1] = -out[1];
+}
+vec3.invertX = function(out){
+  out[0] = -out[0];
+}
 
 //push and pop
 function pushModelViewMatrix(){
@@ -47,7 +53,7 @@ var ylib = (function(){
 }());
 
 var CADCam = (function(){
-  var position = vec3.create();
+  var position = vec3.create(0,0,3.0);
   var sensi = 0.01;
   var center = (function(){
    var position = vec3.create();
@@ -65,7 +71,6 @@ var CADCam = (function(){
     position:position,
     sensi:sensi,
     center:center
-
   }
 }());
 
@@ -106,10 +111,14 @@ document.onmousemove = function handleMouseMove(e){
     mouseProp.clickPos = currentPos;
   }
   if(e.button == 0){//if click button is down
+    vec3.invertY(diff);
     vec3.add(CADCam.center.position, CADCam.center.position, diff);
   }
   if(e.button == 1){// if wheel button is down
-
+    //vec3.invertY(diff);
+    vec3.add(CADCam.position, CADCam.position,diff);
+    //vec3.invertX(diff);
+    //vec3.add(CADCam.center.position, CADCam.center.position, diff);
   }
   if(e.button == 2){//if rigth click button is down
 
@@ -129,3 +138,6 @@ document.onmouseup = function handleMouseDown(event){
   // console.log(event);
   mouseProp.clicking = false;
 }
+
+
+console.log("tanak");
