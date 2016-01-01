@@ -1,6 +1,8 @@
 var input_key_buffer = new Array();
+
 var modelViewMatrix = mat4.create();
 var modelViewMatrixStack = [];
+
 var mouseProp = (function(){
   var rotateSensi = 0.1;
   var clicking = false;
@@ -14,23 +16,6 @@ var mouseProp = (function(){
   }
 }());
 
-//extend Vec3 class
-vec3.setXY = function(out, x, y){
-  out[0] = x;
-  out[1] = y;
-  return out;
-}
-vec3.setZ = function(out, z){
-  out[2] = z;
-  return out;
-}
-vec3.invertY = function(out){
-  out[1] = -out[1];
-}
-vec3.invertX = function(out){
-  out[0] = -out[0];
-}
-
 //push and pop
 function pushModelViewMatrix(){
   var copyToPush = mat4.create(modelViewMatrix);
@@ -43,78 +28,29 @@ function popModelViewMatrix(){
   }
   modelViewMatrix = modelViewMatrixStack.pop();
 }
-
-var ylib = (function(){
-  var hoge;
-  var unko;
-  return{
-    x:hoge
-  }
-}());
-
-var CADCam = (function(){
-  var position = vec3.create([0,0,3.0]);
-  var sensi = 0.01;
-  var center = (function(){
-   var position = vec3.create();
-   return{
-     position:position
-   }
- }());
-  var key={
-    up:"73",//i
-    down:"75",//k
-    left:"74",//j
-    right:"76 "//l
-  }
-  return{
-    position:position,
-    sensi:sensi,
-    center:center
-  }
-}());
-
-CADCam.update =function() {
-  if(input_key_buffer(this.key.up) == true){
-
-  }
+document.onkeydown = function(e){
+	//console.log(e);
+	input_key_buffer[e.keyCode] = true;
+	//console.log("code: " + key_code);
+	console.log("pushed "+ input_key_buffer[e.keyCode]);
 }
 
-ylib.hoge2 = function(){
-  return "hoge";
+document.onkeyup = function(e){
+	input_key_buffer[e.keyCode] = false;
+	console.log("pulled "+ input_key_buffer[e.keyCode]);
 }
-
-
-
-
-
-	document.onkeydown = function(e){
-		//console.log(e);
-		input_key_buffer[e.keyCode] = true;
-		//console.log("code: " + key_code);
-		console.log("pushed "+ input_key_buffer[e.keyCode]);
-	}
-
-	document.onkeyup = function(e){
-		input_key_buffer[e.keyCode] = false;
-		console.log("pulled "+ input_key_buffer[e.keyCode]);
-	}
 
 document.onmousemove = function handleMouseMove(e){
-  //console.log("mousemove -clientX=%d, clientY=%d",event.clientX, event.clientY);
-  //console.log(mouseProp.clicking);
   var diff = vec3.create();
   if(mouseProp.clicking){
-    var currentPos = vec3.create([e.clientX, e.clientY, 0]);
-    vec3.subtract( currentPos, mouseProp.clickPos, diff);
-    vec3.scale(diff, CADCam.sensi, diff);
-    mouseProp.clickPos = currentPos;
+    calculateDiff(e,diff);
   }
-  if(e.button == 0){//if click button is down
-    vec3.invertY(diff);
-    vec3.add( CADCam.center.position, diff);
+  if(e.button == 0 || e.button == 1){//if click button is down
+    var qt = quat4.create([0,0,0,1]);
+    vec3.add( CADCam.position, diff);
+  //  CADCam.updatePosition();
   }
-  if(e.button == 1){// if wheel button is down
+  if(e.button == 1 ){// if wheel button is down
     //vec3.invertY(diff);
     vec3.add( CADCam.position,diff);
     //vec3.invertX(diff);
@@ -125,12 +61,16 @@ document.onmousemove = function handleMouseMove(e){
   }
 //  addDiffPos();
 }
+function calculateDiff(e,diff){
+  var currentPos = vec3.create([e.clientX, e.clientY, 0]);
+  vec3.subtract( currentPos, mouseProp.clickPos, diff);
+  vec3.scale(diff, CADCam.sensi, diff);
+  mouseProp.clickPos = currentPos;
+}
 
 document.onmousedown = function handleMouseUp(event){
-  // console.log("mousemove -clientX=%d, clientY=%d, button=%d",event.clientX, event.clientY, event.button);
   mouseProp.clicking = true;
   vec3.setXY(mouseProp.clickPos,event.clientX, event.clientY);
-  //console.log(mouseProp.clickPos);
 }
 
 document.onmouseup = function handleMouseDown(event){
@@ -138,6 +78,3 @@ document.onmouseup = function handleMouseDown(event){
   // console.log(event);
   mouseProp.clicking = false;
 }
-
-
-console.log("tanak");
